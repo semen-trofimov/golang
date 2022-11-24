@@ -1,0 +1,17 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-golang:1.17-bullseye-build as build
+
+WORKDIR /go/src/github.com/balena-go-hello-world
+
+COPY src/ src/
+
+RUN go mod init && go build /go/src/github.com/balena-go-hello-world/src/server.go
+
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian:bullseye-run
+
+WORKDIR /go/src/github.com/balena-go-hello-world
+
+COPY --from=build /go/src/github.com/balena-go-hello-world/server .
+
+COPY views/ views/
+
+CMD [ "./server" ]
